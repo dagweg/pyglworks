@@ -1,25 +1,36 @@
-import OpenGL.GL as gl
-import OpenGL.GLU as glu
-import OpenGL.GLUT as glut
+import pygame as pg
+from OpenGL.GL import *
 
-def draw():
+class App:
+  ICON_PATH = "./resource/icon.png"
+  icon = pg.image.load(ICON_PATH)
 
-  pass
+  def __init__(self,width,height,title):
+    pg.init()
+    pg.display.set_mode((width,height),pg.OPENGL|pg.DOUBLEBUF)
+    pg.display.set_caption(title)
+    print(self.icon)
+    pg.display.set_icon(self.icon)
+    self.clock = pg.time.Clock()
+    #initialize opengl
+    glClearColor(0.1,0.1,0.1,1)
+    self.mainLoop()
+  
+  def mainLoop(self):
+    running = True
+    while running:
+      for evt in pg.event.get():
+        if evt.type == pg.QUIT:
+          running = False
+        
+      glClear(GL_COLOR_BUFFER_BIT)
+      self.clock.tick(60)
+    self.quit()
 
-def reshape(w,h):
-  gl.glViewport(0,0,w,h)
+  def quit(self):
+    pg.quit()
 
-def main():
-  width = 640
-  height = 480
+if __name__=='__main__':
+  app = App(500,500,'Unity Destroyer 2024')
 
-  glut.glutInit()
-  if glut.INITIALIZED:
-    glut.glutDisplayFunc(draw)
-    glut.glutReshapeFunc(reshape)
-    glut.glutInitWindowSize(width,height)
-    glut.glutCreateWindow("Unity 2024.0.1f1")
-    glut.glutMainLoop()
-
-if __name__ == '__main__':
-  main()
+  
