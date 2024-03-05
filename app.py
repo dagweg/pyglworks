@@ -1,6 +1,11 @@
 import pygame as pg
 from pygame.locals import *
 from OpenGL.GL import *
+from pywavefront import Wavefront
+import numpy as np
+from collections import deque
+from numpy.linalg import *
+import random
 
 class App:
   ICON_PATH = "./resource/icon.png"
@@ -9,16 +14,25 @@ class App:
 
   def __init__(self,width,height,title):
     pg.init()
-    self.screen = pg.display.set_mode((width,height),pg.OPENGL|pg.DOUBLEBUF)
+    pg.display.set_mode((width,height),pg.OPENGL|pg.DOUBLEBUF)
     pg.display.set_caption(title)
     pg.display.set_icon(self.icon)
     self.clock = pg.time.Clock()
 
-    self.cube = pg.image.load(self.MODEL_PATH).convert()
-
-
-    glClearColor(1,1,1,1)
+    glClearColor(0.8,0.8,0.8,1)
     self.mainLoop()
+
+  def draw(self):
+    r = random.random()
+    g = random.random()
+    b = random.random()
+    glBegin(GL_TRIANGLES)
+    glColor3f(r,g,b)
+    glVertex3f(-0.5,0,0)
+    glVertex3f(0.5,0,0)
+    glVertex3f(0,0.5,0)
+    glEnd()
+    pass
   
   def mainLoop(self):
     running = True
@@ -26,17 +40,16 @@ class App:
       for evt in pg.event.get():
         if evt.type == pg.QUIT:
           running = False
-      
-
       glClear(GL_COLOR_BUFFER_BIT)
+      self.draw()
       pg.display.flip()
-
-      self.screen.blit(self.cube,(0,0))
-
-      self.clock.tick(60)
+      self.clock.tick(5)
     self.quit()
 
+  
+
   def quit(self):
+    q=deque()
     pg.quit()
 
 if __name__=='__main__':
