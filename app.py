@@ -2,14 +2,13 @@ import pygame as pg
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from numpy.linalg import *
-from primitives.primitives import Primitives
-
+from primitives.d3 import Cube
+import renderer.primitiveRenderer as pr
+import random
 
 class App:
-  # ICON_PATH = "./resource/icon.png"
-  # icon = pg.image.load(ICON_PATH)
-  primitive = Primitives()
+
+  cube = Cube()
 
   def __init__(self,width,height,title):
     pg.init()
@@ -17,41 +16,61 @@ class App:
     pg.display.set_caption(title)
     self.clock = pg.time.Clock()
     glClearColor(0.1,0.1,0.1,1)
-    gluPerspective(45,width/height,0.1,50)
-    glTranslatef(0,0,-5)
+    gluPerspective(45,width/height,0.1,500)
+    glTranslatef(0,0,-50)
+    glRotatef(5,0,0,0)
     self.mainLoop()
 
   def draw(self):
-    primitive = self.primitive
-
-    glBegin(GL_QUADS)
-    for surface in primitive.cube.surfaces:
-      for vertex,color in zip(surface,primitive.cube.surfaces_colors):
-        glColor3fv(color) 
-        glVertex3fv(primitive.cube.vertices[vertex])
-    glEnd()
-
-    glBegin(GL_LINES) 
-    glColor3f(0.9,0.9,0.9)
-    for edge in primitive.cube.edges:
-      for vertex in edge:
-        glVertex3fv(primitive.cube.vertices[vertex])
-    glEnd()
+    pr.Primitive3D.render(self.cube,wireframe=True)
     pass
   
   def mainLoop(self):
     while True:
-      for evt in pg.event.get():
-        if evt.type == pg.QUIT:
-          pg.quit()
+      self.pygameEventHandler()
 
       glClear(GL_COLOR_BUFFER_BIT)
+      
       self.draw()
-      glRotatef(1,45,90,45)
 
+      # print(glGetDoublev(GL_MODELVIEW_MATRIX))
+      x,y,z,zc = glGetDoublev(GL_MODELVIEW_MATRIX)[3]
+      if z < 0:
+        rx =random.random()
+        print(rx)
+        if -3 < x < 3 and -3 < y < 3:
+          pg.time.wait(2000)
+        else:
+          pg.time.wait(10)
+        glTranslatef(x+rx if x > 0 else x-rx,0,-50)
+      
+
+
+      # glRotatef(1,45,90,45)
+      glTranslatef(0,0,0.35)
       self.clock.tick(120)
       pg.time.wait(10)
       pg.display.flip()
+
+  def pygameEventHandler(self):
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+          pg.quit()
+        if event.type == pg.KEYDOWN:
+          if event.key == pg.K_LEFT:
+            glTranslatef(0.5,0,0)
+          if event.key == pg.K_RIGHT:
+            glTranslatef(-0.5,0,0)
+          # if event.key == pg.K_UP:
+          #   glTranslatef(0,-0.5,0)
+          # if event.key == pg.K_DOWN:
+          #   glTranslatef(0,0.5,0)
+
+        if event.type == pg.MOUSEBUTTONDOWN:
+          if event.button == 4:
+            glTranslate(0,0,0.1)
+          if event.button == 5:
+            glTranslate(0,0,-0.1)
 
 
 if __name__=='__main__':
