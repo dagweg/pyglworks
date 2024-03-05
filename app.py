@@ -1,15 +1,54 @@
 import pygame as pg
 from pygame.locals import *
 from OpenGL.GL import *
+from OpenGL.GLU import *
 from pywavefront import Wavefront
 import numpy as np
 from collections import deque
 from numpy.linalg import *
 import random
 
+vertices = (
+  (1,1,-1),
+  (-1,1,-1),
+  (-1,-1,-1),
+  (1,-1,-1),
+
+  (1,1,1),
+  (-1,1,1),
+  (-1,-1,1),
+  (1,-1,1),
+)
+
+edges = (
+  (0,1),
+  (0,3),
+  (0,4),
+
+  (2,1),
+  (2,3),
+  (2,6),
+
+  (5,1),
+  (5,4),
+  (5,6),
+
+  (7,3),
+  (7,4),
+  (7,6),
+)
+
+surfaces = (
+  (0,1,2,3),
+  (0,1,5,4),
+  (0,4,7,3),
+  (3,2,6,7),
+  (6,5,4,7),  
+  (6,2,1,5),  
+)
+
 class App:
   ICON_PATH = "./resource/icon.png"
-  MODEL_PATH = './resource/cube.obj'
   icon = pg.image.load(ICON_PATH)
 
   def __init__(self,width,height,title):
@@ -18,41 +57,43 @@ class App:
     pg.display.set_caption(title)
     pg.display.set_icon(self.icon)
     self.clock = pg.time.Clock()
-
-    glClearColor(0.8,0.8,0.8,1)
+    glClearColor(0.1,0.1,0.1,1)
+    gluPerspective(45,width/height,0.1,50)
+    glTranslatef(0,0,-5)
     self.mainLoop()
 
   def draw(self):
-    r = random.random()
-    g = random.random()
-    b = random.random()
-    glBegin(GL_TRIANGLES)
-    glColor3f(r,g,b)
-    glVertex3f(-0.5,0,0)
-    glVertex3f(0.5,0,0)
-    glVertex3f(0,0.5,0)
+
+    glBegin(GL_QUADS)
+    for surface in surfaces:
+      glColor3f(0.5,0.5,0)
+      for vertex in surface:
+        glVertex3fv(vertices[vertex])
     glEnd()
-    pass
+
+    # glBegin(GL_LINES) 
+    # glColor3f(0,0,0)
+    # for edge in edges:
+    #   for vertex in edge:
+    #     glVertex3fv(vertices[vertex])
+    # glEnd()
+    # pass
   
   def mainLoop(self):
-    running = True
-    while running:
+    while True:
       for evt in pg.event.get():
         if evt.type == pg.QUIT:
-          running = False
+          pg.quit()
       glClear(GL_COLOR_BUFFER_BIT)
       self.draw()
+      glRotatef(1,45,90,45)
+
+      self.clock.tick(120)
+      pg.time.wait(10)
       pg.display.flip()
-      self.clock.tick(5)
-    self.quit()
 
-  
-
-  def quit(self):
-    q=deque()
-    pg.quit()
 
 if __name__=='__main__':
-  app = App(640,480,'Xg Engine Pro 2024')
+  app = App(800,600,'Xg Engine Pro 2024')
 
   
