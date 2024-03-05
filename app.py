@@ -2,60 +2,19 @@ import pygame as pg
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from pywavefront import Wavefront
-import numpy as np
-from collections import deque
 from numpy.linalg import *
-import random
+from primitives.primitives import Primitives
 
-vertices = (
-  (1,1,-1),
-  (-1,1,-1),
-  (-1,-1,-1),
-  (1,-1,-1),
-
-  (1,1,1),
-  (-1,1,1),
-  (-1,-1,1),
-  (1,-1,1),
-)
-
-edges = (
-  (0,1),
-  (0,3),
-  (0,4),
-
-  (2,1),
-  (2,3),
-  (2,6),
-
-  (5,1),
-  (5,4),
-  (5,6),
-
-  (7,3),
-  (7,4),
-  (7,6),
-)
-
-surfaces = (
-  (0,1,2,3),
-  (0,1,5,4),
-  (0,4,7,3),
-  (3,2,6,7),
-  (6,5,4,7),  
-  (6,2,1,5),  
-)
 
 class App:
-  ICON_PATH = "./resource/icon.png"
-  icon = pg.image.load(ICON_PATH)
+  # ICON_PATH = "./resource/icon.png"
+  # icon = pg.image.load(ICON_PATH)
+  primitive = Primitives()
 
   def __init__(self,width,height,title):
     pg.init()
     pg.display.set_mode((width,height),pg.OPENGL|pg.DOUBLEBUF)
     pg.display.set_caption(title)
-    pg.display.set_icon(self.icon)
     self.clock = pg.time.Clock()
     glClearColor(0.1,0.1,0.1,1)
     gluPerspective(45,width/height,0.1,50)
@@ -63,27 +22,29 @@ class App:
     self.mainLoop()
 
   def draw(self):
+    primitive = self.primitive
 
     glBegin(GL_QUADS)
-    for surface in surfaces:
-      glColor3f(0.5,0.5,0)
-      for vertex in surface:
-        glVertex3fv(vertices[vertex])
+    for surface in primitive.cube.surfaces:
+      for vertex,color in zip(surface,primitive.cube.surfaces_colors):
+        glColor3fv(color) 
+        glVertex3fv(primitive.cube.vertices[vertex])
     glEnd()
 
-    # glBegin(GL_LINES) 
-    # glColor3f(0,0,0)
-    # for edge in edges:
-    #   for vertex in edge:
-    #     glVertex3fv(vertices[vertex])
-    # glEnd()
-    # pass
+    glBegin(GL_LINES) 
+    glColor3f(0.9,0.9,0.9)
+    for edge in primitive.cube.edges:
+      for vertex in edge:
+        glVertex3fv(primitive.cube.vertices[vertex])
+    glEnd()
+    pass
   
   def mainLoop(self):
     while True:
       for evt in pg.event.get():
         if evt.type == pg.QUIT:
           pg.quit()
+
       glClear(GL_COLOR_BUFFER_BIT)
       self.draw()
       glRotatef(1,45,90,45)

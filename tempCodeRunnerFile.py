@@ -1,8 +1,4 @@
 
-    # glBegin(GL_LINES) 
-    # glColor3f(0,0,0)
-    # for edge in edges:
-    #   for vertex in edge:
-    #     glVertex3fv(vertices[vertex])
-    # glEnd()
-    # pass
+      self.clock.tick(120)
+      pg.time.wait(10)
+      pg.display.flip()
