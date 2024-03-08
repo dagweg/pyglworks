@@ -4,7 +4,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from primitives.d3 import Cube, Cylinder
 import renderer.primitiveRenderer as pr
-import random
+from pygame_gui.elements import UIButton
+from pygame_gui.ui_manager import UIManager
 
 class App:
 
@@ -15,15 +16,19 @@ class App:
 
   def __init__(self,width,height,title):
     pg.init()
-    pg.display.set_mode((width,height),pg.OPENGL|pg.DOUBLEBUF)
+    self.screen = pg.display.set_mode((width,height),pg.OPENGL|pg.DOUBLEBUF)
     pg.display.set_caption(title)
     gluPerspective(45,width/height,0.1,500)
     self.clock = pg.time.Clock()
     glClearColor(0.1,0.1,0.1,1)
     glTranslatef(0,0,-50)
     glRotate(45,1,0,0)
-    for i in range(3):
-      self.mainLoop()
+
+    # initalize ui
+    self.ui_manager = UIManager((width//3,height))
+    button = UIButton(relative_rect=(0,0,300,200), text="Add",manager=self.ui_manager)
+
+    self.mainLoop()
 
   def draw(self):
     pr.Primitive3D.render(self.cube,wireframe=True)
@@ -56,6 +61,11 @@ class App:
       glRotatef(1,45,45,0)
       # glTranslatef(self.x_translate,0,0.5)
       self.clock.tick(120)
+
+      self.ui_manager.update(1/60)
+      self.screen.fill(255,255,255)
+      self.ui_manager.draw_ui(self.screen)
+
       pg.time.wait(10)
       pg.display.flip()
 
