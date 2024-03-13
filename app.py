@@ -103,6 +103,6 @@ class App:
 
 
 if __name__=='__main__':
-  app = App(800,600,'Xg Engine Pro 2024')
+  app = App(800,600,'engine')
 
   
